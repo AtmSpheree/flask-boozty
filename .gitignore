@@ -133,3 +133,6 @@ venv/
 
 # Idea
 .idea/
+
+# Node JS
+static/scripts/node
