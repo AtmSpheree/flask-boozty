@@ -1,0 +1,72 @@
+.wrapper {
+  max-width: 1920px;
+  height: auto;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+main {
+  min-height: 1000px;
+}
+
+.main_page_container {
+  display: flex;
+  justify-content: safe;
+  align-items: flex-start;
+}
+
+.main_page_navigation_container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.toggle_theme_btn {
+  width: auto;
+}
+
+.main_page_nav_buttons_group {
+  height: 3em;
+  align-items: center;
+  margin-right: 1em;
+}
+
+.github_button {
+  height: 100%;
+  align-content: center;
+  display: flex;
+  align-items: center;
+}
+
+.main_page_main_container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.btn:focus,
+.btn:active {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+footer {
+  width: 100%;
+  height: 150px;
+}
+
+.avatar_mini {
+  width: 50px;
+  height: 50px;
+}
+
+.avatar_mini_2 {
+  width: 20px;
+  height: 20px;
+}
+
+.simple_form {
+  max-width: 1000px;
+  min-width: 250px;
+}
