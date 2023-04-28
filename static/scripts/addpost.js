@@ -1,20 +1,10 @@
 const LOCAL_STORAGE_IS_OPENED_KEY = "is-post-opened";
-const LOCAL_STORAGE_ERRORS_KEY = "form-errors";
 
 const LOCAL_META_DATA_IS_OPENED = JSON.parse(
   localStorage.getItem(LOCAL_STORAGE_IS_OPENED_KEY)
 );
-const LOCAL_META_DATA_ERRORS = JSON.parse(
-  localStorage.getItem(LOCAL_STORAGE_ERRORS_KEY)
-);
 
 let isOpened = LOCAL_META_DATA_IS_OPENED && LOCAL_META_DATA_IS_OPENED.isOpened;
-
-if (LOCAL_META_DATA_ERRORS.length != 0) {
-  var errors = LOCAL_META_DATA_ERRORS;
-} else {
-  var errors = Array();
-}
 
 let form_checkbox = document.getElementById("is_opened");
 if (isOpened) {
@@ -22,14 +12,6 @@ if (isOpened) {
 } else {
   form_checkbox.checked = false;
   renderUsersBlock();
-}
-if (errors) {
-  for (index = 0; index < errors.length; index++) {
-    let element = document.getElementById(errors[index]["child_id"]);
-    let parent = findParentBySelector(element, "h5");
-    console.log(element, parent);
-    renderFormErrorAfterElement(parent, errors[index]["message"]);
-  }
 }
 
 function changeFormCheckboxIsOpened() {
@@ -41,7 +23,11 @@ function changeFormCheckboxIsOpened() {
 
 function submitAddPostForm() {
   let errors_temp = Array();
-  json_file = JSON.parse(
+  let errors = document.getElementsByClassName("add_post_error");
+  while (errors[0]) {
+    errors[0].parentNode.removeChild(errors[0]);
+  }
+  let json_file = JSON.parse(
     document.getElementById("stuff").innerHTML.replace(/&#34;/gi, '"')
   );
 
@@ -147,8 +133,15 @@ function submitAddPostForm() {
   let invited_users_input = document.getElementById("invited_users");
   invited_users_input.value = users.join(", ");
 
-  localStorage.setItem(LOCAL_STORAGE_ERRORS_KEY, JSON.stringify(errors_temp));
-  document.form.submit();
+  if (errors_temp.length == 0) {
+    document.form.submit();
+  } else {
+    for (index = 0; index < errors_temp.length; index++) {
+      let element = document.getElementById(errors_temp[index]["child_id"]);
+      let parent = findParentBySelector(element, "h5");
+      renderFormErrorAfterElement(parent, errors_temp[index]["message"]);
+    }
+  }
 }
 
 function getAllUsers() {

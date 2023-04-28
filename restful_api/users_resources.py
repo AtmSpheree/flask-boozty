@@ -4,6 +4,7 @@ from data.users import User
 from flask import jsonify
 from flask_login import login_required, current_user, logout_user
 from tools.misc import check_is_user_admin_func
+from sqlalchemy import or_
 
 
 parser = reqparse.RequestParser()
@@ -24,9 +25,10 @@ def abort_if_user_not_found(user_id):
 
 def abort_if_user_exists(email, nickname):
     session = db_session.create_session()
-    users = session.query(User).filter(User.email == email | User.nickname == nickname).all()
-    if users:
-        abort(404, message=f"A user with such an email and/or nickname already exists")
+    users = session.query(User).all()
+    for user in users:
+        if user.email.lower() == email.lower() or user.nickname.lower() == nickname.lower():
+            abort(404, message=f"A user with such an email and/or nickname already exists")
 
 
 class UserResource(Resource):

@@ -31,8 +31,12 @@ function insertAfter(referenceNode, newNode) {
 
 function renderFormErrorAfterElement(div, message) {
   let error_node = document.createElement("div");
-  error_node.className = "alert alert-danger mb-1 p-2";
+  error_node.className = "add_post_error alert alert-danger mb-1 p-2";
   error_node.setAttribute("role", "alert");
   error_node.innerHTML = message;
   insertAfter(div, error_node);
+}
+
+function RedirectOnLinkWithScript(sender) {
+  document.location.href = sender.getAttribute("href");
 }

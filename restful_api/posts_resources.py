@@ -31,15 +31,30 @@ class PostResource(Resource):
         session = db_session.create_session()
         post = session.query(Post).get(post_id)
         if current_user is UserMixin:
-            if post.is_opened or current_user in post.invited_users:
-                return jsonify({'post': post.to_dict(
-                    only=('title', 'description', 'files', 'is_opened', 'created_date'))})
+            if post.is_opened == 1 or current_user in post.invited_users:
+                result = {'post': post.to_dict(
+                    only=('title', 'description', 'files', 'is_opened', 'created_date'))}
+                result['post']['user_id'] = post.user.id
+                result['post']['user_nickname'] = post.user.nickname
+                return result
             else:
-                abort(404, message=f"You do not have access to Post {post_id}")
+                if check_is_user_admin_func(current_user.email):
+                    result = {'post': post.to_dict(
+                        only=('title', 'description', 'files', 'is_opened', 'created_date'))}
+                    result['post']['user_id'] = post.user.id
+                    result['post']['user_nickname'] = post.user.nickname
+                    result['post']['tags'] = [i.id for i in post.tags]
+                    return result
+                else:
+                    abort(404, message=f"You do not have access to Post {post_id}")
         else:
             if post.is_opened:
-                return jsonify({'post': post.to_dict(
-                    only=('title', 'description', 'files', 'is_opened', 'created_date'))})
+                result = {'post': post.to_dict(
+                    only=('title', 'description', 'files', 'is_opened', 'created_date'))}
+                result['post']['user_id'] = post.user.id
+                result['post']['user_nickname'] = post.user.nickname
+                result['post']['tags'] = [i.id for i in post.tags]
+                return result
             else:
                 abort(404, message=f"You do not have access to Post {post_id}")
 
@@ -67,6 +82,7 @@ class PostListResource(Resource):
                     posts = session.query(Post).filter(Post.user_id == user_id).all()
                 else:
                     posts = session.query(Post).filter(Post.user_id == user_id)
+                    posts = [i for i in posts if current_user in i.invited_users or i.is_opened == 1]
             else:
                 if check_is_user_admin_func(current_user.email):
                     posts = session.query(Post).all()
@@ -80,6 +96,7 @@ class PostListResource(Resource):
                                       'created_date'))
             temp['user_id'] = item.user.id
             temp['user_nickname'] = item.user.nickname
+            temp['tags'] = [i.id for i in item.tags]
             result['posts'] = result['posts'] + [temp]
         return jsonify(result)
 

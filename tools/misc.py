@@ -49,7 +49,14 @@ def check_is_user_admin(func):
 
 
 def test_is_photo(string):
-    base = string.split('.')[1]
+    if string:
+        base = string.split('.')[1]
+    else:
+        return False
     if base.lower() in [i.lower() for i in variables.ALLOWED_EXTENSIONS_PHOTOS]:
         return True
     return False
+
+
+def get_only_photos_files(array):
+    return [i for i in array if test_is_photo(i)]

@@ -50,7 +50,3 @@ function disableDarkTheme() {
   GITHUB_LOGO_IMG.setAttribute("src", GITHUB_LOGO_IMG_WHITE_PATH);
   GITHUB_TEXT_IMG.setAttribute("src", GITHUB_TEXT_IMG_WHITE_PATH);
 }
-
-function RedirectOnLinkWithScript(sender) {
-  document.location.href = sender.getAttribute("href");
-}

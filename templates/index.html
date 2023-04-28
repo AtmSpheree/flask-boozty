@@ -55,8 +55,8 @@
               data-bs-ride="carousel"
             >
               <div class="carousel-indicators">
-                {% for file in post["files"].split(", ") %} {% if
-                test_is_photo(file) %}
+                {% for file in get_only_photos_files(post["files"].split(", "))
+                %} {% if loop.index0 == 0 %}
                 <button
                   type="button"
                   data-bs-target="#carouselExampleIndicators_{{number}}"
@@ -75,8 +75,8 @@
                 {% endif %} {% endfor %}
               </div>
               <div class="carousel-inner">
-                {% for file in post["files"].split(", ") %} {% if
-                test_is_photo(file) %} {% if loop.index0 == 0 %}
+                {% for file in get_only_photos_files(post["files"].split(", "))
+                %} {% if loop.index0 == 0 %}
                 <div class="carousel-item active">
                   <img
                     src="{{url_func(file)}}"
@@ -92,7 +92,7 @@
                     alt="Slide {{loop.index}}"
                   />
                 </div>
-                {% endif %} {% endif %} {% endfor %}
+                {% endif %} {% endfor %}
               </div>
               <button
                 class="carousel-control-prev"
@@ -121,7 +121,7 @@
             </div>
           </div>
           <div id="not_photos_files_{{loop.index}}">
-            {% for file in post["files"].split(", ") %} {% if not
+            {% for file in post["files"].split(", ") %} {% if file != "" and not
             test_is_photo(file) %}
             <div class="card mb-3 ms-3 p-2" style="max-width: 840px">
               <div class="row g-0 d-flex align-items-center">
@@ -159,32 +159,36 @@
     </a>
     {% endif %}
     <h4 class="mt-3">Тэги</h4>
-    <div class="btn-group-vertical" role="group">
+    <div id="tags_group" class="btn-group-vertical" role="group">
+      <div id="accessed_tags" style="display: none">{{accessed_tags}}</div>
       {% for tag in tags %} {% if loop.first %}
       <input
-        type="radio"
+        type="checkbox"
         class="btn-check"
-        name="vbtn-radio"
-        id="vbtn-radio{{loop.index}}"
+        value="0"
+        onclick="tagChange(this)"
+        id="btncheck{{loop.index}}"
         autocomplete="off"
         checked
       />
       {% else %}
       <input
-        type="radio"
+        type="checkbox"
         class="btn-check"
-        name="vbtn-radio"
-        id="vbtn-radio{{loop.index}}"
+        value="{{tag['id']}}"
+        onclick="tagChange(this)"
+        id="btncheck{{loop.index}}"
         autocomplete="off"
       />
       {% endif %}
       <label
         class="btn btn-outline-secondary btn-lg"
-        for="vbtn-radio{{loop.index}}"
+        for="btncheck{{loop.index}}"
         >{{tag['title']}}</label
       >
       {% endfor %}
     </div>
   </div>
 </div>
+<script type="text/javascript" src="static/scripts/index.js"></script>
 {% endblock %}

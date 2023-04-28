@@ -1,4 +1,4 @@
-from flask import Flask, redirect, render_template, abort
+from flask import Flask, redirect, render_template, abort, request, jsonify
 import json
 import os
 from data import db_session
@@ -14,7 +14,7 @@ from data.posts import Post
 from data.tags import Tag
 from variables import (UPLOAD_FOLDER, MAX_CONTENT_LENGTH_BYTES, MAX_FILES_COUNT)
 import variables
-from tools.misc import translit_ru_to_en, test_is_photo
+from tools.misc import translit_ru_to_en, test_is_photo, get_only_photos_files
 
 
 with open('connetion.json', 'r') as data:
@@ -119,7 +119,7 @@ def add_post():
                'description': form.description.data,
                'is_opened': form.is_opened.data,
                'tags': form.tags.data,
-               'invited_users': form.invited_users}
+               'invited_users': form.invited_users.data}
         files = []
         for item in form.files.data:
             if not item.filename:
@@ -127,6 +127,8 @@ def add_post():
             filename = translit_ru_to_en(item.filename)
             filename = variables.files.save(item, name=secure_filename(filename))
             files.append(filename)
+        if len(files) > variables.MAX_FILES_COUNT:
+            abort(404)
         req['files'] = ', '.join(files)
         res = posts_resources.PostListResource().post(args=req)
         if res.json['success'] == 'OK':
@@ -157,17 +159,32 @@ def not_found(error):
 
 @app.route('/')
 def index():
-    posts = posts_resources.PostListResource().get().json
+    accessed_tags = []
+    accessed_tags = request.args.get('tags')
+    posts = posts_resources.PostListResource().get().json['posts']
+    if accessed_tags and accessed_tags != '':
+        try:
+            accessed_tags = list(map(int, accessed_tags.split(';')))
+        except Exception:
+            abort(404)
+        session = db_session.create_session()
+        for i in accessed_tags:
+            tag = session.query(Tag).filter(Tag.id == i)
+            if not tag:
+                abort(404)
+        posts = [i for i in posts if set(i['tags']).issuperset(set(accessed_tags))]
     tags = tags_resources.TagListResource().get().json['tags']
     tags.insert(0, {'title': 'Все'})
     if not isinstance(current_user, UserMixin):
         avatar_path = ''
     else:
         avatar_path = variables.photos.url(current_user.avatar)
-    return render_template('index.html', title='Boozty', posts=posts['posts'],
+    return render_template('index.html', title='Boozty', posts=posts,
                            tags=tags, avatar_path=avatar_path,
                            url_func=variables.files.url,
-                           test_is_photo=test_is_photo)
+                           test_is_photo=test_is_photo,
+                           get_only_photos_files=get_only_photos_files,
+                           accessed_tags=json.dumps(accessed_tags))
 
 
 @app.route('/user/<int:user_id>')
