@@ -70,3 +70,12 @@ footer {
   max-width: 1000px;
   min-width: 250px;
 }
+
+.user_block {
+  width: 480px;
+}
+
+.avatar_max {
+  width: 448px;
+  height: 448px;
+}

@@ -31,29 +31,22 @@ class PostResource(Resource):
         session = db_session.create_session()
         post = session.query(Post).get(post_id)
         if current_user is UserMixin:
-            if post.is_opened == 1 or current_user in post.invited_users:
-                result = {'post': post.to_dict(
-                    only=('title', 'description', 'files', 'is_opened', 'created_date'))}
-                result['post']['user_id'] = post.user.id
-                result['post']['user_nickname'] = post.user.nickname
-                return result
-            else:
-                if check_is_user_admin_func(current_user.email):
-                    result = {'post': post.to_dict(
-                        only=('title', 'description', 'files', 'is_opened', 'created_date'))}
-                    result['post']['user_id'] = post.user.id
-                    result['post']['user_nickname'] = post.user.nickname
-                    result['post']['tags'] = [i.id for i in post.tags]
-                    return result
-                else:
-                    abort(404, message=f"You do not have access to Post {post_id}")
-        else:
-            if post.is_opened:
+            if (post.is_opened == 1 or current_user in post.invited_users) or check_is_user_admin_func(current_user.email):
                 result = {'post': post.to_dict(
                     only=('title', 'description', 'files', 'is_opened', 'created_date'))}
                 result['post']['user_id'] = post.user.id
                 result['post']['user_nickname'] = post.user.nickname
                 result['post']['tags'] = [i.id for i in post.tags]
+                return result
+            else:
+                abort(404, message=f"You do not have access to Post {post_id}")
+        else:
+            if post.is_opened == 1:
+                result = {'post': post.to_dict(
+                    only=('title', 'description', 'files', 'is_opened', 'created_date'))}
+                result['post']['user_id'] = post.user.id
+                result['post']['user_nickname'] = post.user.nickname
+                result['post']['tags'] = [{'id': i.id, 'title': i.title} for i in post.tags]
                 return result
             else:
                 abort(404, message=f"You do not have access to Post {post_id}")
@@ -96,7 +89,7 @@ class PostListResource(Resource):
                                       'created_date'))
             temp['user_id'] = item.user.id
             temp['user_nickname'] = item.user.nickname
-            temp['tags'] = [i.id for i in item.tags]
+            temp['tags'] = [{'id': i.id, 'title': i.title} for i in item.tags]
             result['posts'] = result['posts'] + [temp]
         return jsonify(result)
 

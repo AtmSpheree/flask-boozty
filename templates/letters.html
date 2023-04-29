@@ -1,25 +1,10 @@
 {% extends "base.html" %} {% block content %}
 <meta charset="UTF-8" />
-<h2 align="center" class="display-4 mb-3">Пользователь</h2>
 <div class="main_page_main_container justify-content-around mt-5">
-  <div class="d-flex align-items-center flex-column">
-    <div
-      class="d-flex flex-column align-items-start bg-light bg-gradient rounded p-3 user_block"
-    >
-      <div class="d-flex justify-content-center align-item-center w-100">
-        <img class="avatar_max img-fluid" src="{{avatar_path}}" />
-      </div>
-      <h3 class="mt-2">Nickname: <b>{{user["nickname"]}}</b></h3>
-      <h4>Surname: <b>{{user["surname"]}}</b></h4>
-      <h4>Name: <b>{{user["name"]}}</b></h4>
-      <h5>About:</h5>
-      <p>{{user["about"]}}</p>
-    </div>
-  </div>
   <div class="d-flex align-items-center flex-column w-50">
-    <h2 align="center" class="display-4 mb-3">Лента записей</h2>
+    <h2 align="center" class="display-4 mb-3">Письма</h2>
     <div class="accordion w-100" id="accordionExample">
-      {% for post in posts %} {% set number = loop.index %}
+      {% for letter in letters %} {% set number = loop.index %}
       <div class="accordion-item">
         <h2 class="accordion-header">
           <button
@@ -34,21 +19,18 @@
               class="d-flex flex-column align-items-start justify-content-start w-100"
             >
               <div class="d-flex justify-content-between w-100">
-                <h4>{{post["title"]}}</h4>
-                <h5>{{post.created_date}}</h5>
+                <h4>{{letter["title"]}}</h4>
+                <h5>{{letter["created_date"]}}</h5>
               </div>
-              <h4>
-                <a
-                  onClick="RedirectOnLinkWithScript(this);return false;"
-                  href="/user/{{post['user_id']}}"
-                  >{{post['user_nickname']}}</a
-                >
-              </h4>
-              <h5>Tags: {{', '.join(get_tags_title(post["tags"]))}}</h5>
+              <a
+                onClick="RedirectOnLinkWithScript(this);return false;"
+                href="/user/{{letter['user']['id']}}"
+                ><h4>{{letter['user']['nickname']}}</h4></a
+              >
               <p>
-                {% if post["description"]|length > 70 %}
-                {{post["description"][:70]}}... {% else %}
-                {{post["description"]}} {% endif %}
+                {% if letter["description"]|length > 70 %}
+                {{letter["description"][:70]}}... {% else %}
+                {{letter["description"]}} {% endif %}
               </p>
             </div>
           </button>
@@ -164,5 +146,53 @@
       {% endfor %}
     </div>
   </div>
+  <div
+    class="d-flex flex-column align-items-center bg-light bg-gradient rounded p-3"
+    role="group"
+    id="main_page_navigation"
+  >
+    {% if current_user.is_authenticated %}
+    <a type="button" class="btn btn-primary btn-lg" href="/add_post">
+      Новая запись
+    </a>
+    {% endif %}
+    <h4 class="mt-3">Тэги</h4>
+    {% if current_user.is_authenticated %} {% if
+    check_is_user_admin_func(current_user.email) %}
+    <a type="button" class="btn btn-primary btn-lg mb-3" href="/add_tag">
+      Новый тег
+    </a>
+    {% endif %} {% endif %}
+    <div id="tags_group" class="btn-group-vertical" role="group">
+      <div id="accessed_tags" style="display: none">{{accessed_tags}}</div>
+      {% for tag in tags %} {% if loop.first %}
+      <input
+        type="checkbox"
+        class="btn-check"
+        value="0"
+        onclick="tagChange(this)"
+        id="btncheck{{loop.index}}"
+        autocomplete="off"
+        checked
+      />
+      {% else %}
+      <input
+        type="checkbox"
+        class="btn-check"
+        value="{{tag['id']}}"
+        onclick="tagChange(this)"
+        id="btncheck{{loop.index}}"
+        autocomplete="off"
+      />
+      {% endif %}
+      <label
+        class="btn btn-outline-secondary btn-lg"
+        for="btncheck{{loop.index}}"
+        >{{tag['title']}}</label
+      >
+      {% endfor %}
+    </div>
+  </div>
 </div>
+<script type="text/javascript" src="static/scripts/index.js"></script>
 {% endblock %}

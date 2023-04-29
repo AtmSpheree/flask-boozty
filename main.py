@@ -6,6 +6,7 @@ from flask_restful import Api
 from forms.loginform import LoginForm
 import forms.registerform as registerform
 import forms.addpostform as addpostform
+import forms.addtagform as addtagform
 from flask_uploads import UploadSet, configure_uploads, patch_request_class, secure_filename
 from restful_api import users_resources, posts_resources, letters_resources, tags_resources
 from flask_login import LoginManager, logout_user, login_required, login_user, current_user, UserMixin
@@ -14,7 +15,7 @@ from data.posts import Post
 from data.tags import Tag
 from variables import (UPLOAD_FOLDER, MAX_CONTENT_LENGTH_BYTES, MAX_FILES_COUNT)
 import variables
-from tools.misc import translit_ru_to_en, test_is_photo, get_only_photos_files
+from tools.misc import translit_ru_to_en, test_is_photo, get_only_photos_files, get_tags_title, check_is_user_admin, check_is_user_admin_func
 
 
 with open('connetion.json', 'r') as data:
@@ -172,7 +173,7 @@ def index():
             tag = session.query(Tag).filter(Tag.id == i)
             if not tag:
                 abort(404)
-        posts = [i for i in posts if set(i['tags']).issuperset(set(accessed_tags))]
+        posts = [i for i in posts if set([k["id"] for k in i["tags"]]).issuperset(set(accessed_tags))]
     tags = tags_resources.TagListResource().get().json['tags']
     tags.insert(0, {'title': 'Все'})
     if not isinstance(current_user, UserMixin):
@@ -184,16 +185,57 @@ def index():
                            url_func=variables.files.url,
                            test_is_photo=test_is_photo,
                            get_only_photos_files=get_only_photos_files,
-                           accessed_tags=json.dumps(accessed_tags))
+                           accessed_tags=json.dumps(accessed_tags),
+                           get_tags_title=get_tags_title,
+                           check_is_user_admin_func=check_is_user_admin_func)
 
 
 @app.route('/user/<int:user_id>')
 def user_page(user_id: int):
     user = users_resources.UserResource().get(user_id).json['user']
     posts = posts_resources.PostListResource().get(user_id).json
+    if user["avatar"]:
+        avatar_path = variables.photos.url(user["avatar"])
+    else:
+        avatar_path = "/static/img/standart_avatar.png"
     return render_template('user_page.html', title=user["nickname"],
                            posts=posts["posts"], user=user,
-                           avatar_path=variables.photos.url(user["avatar"]))
+                           avatar_path=avatar_path,
+                           test_is_photo=test_is_photo,
+                           get_only_photos_files=get_only_photos_files,
+                           url_func=variables.files.url,
+                           get_tags_title=get_tags_title)
+
+
+@app.route('/add_tag', methods=['GET', 'POST'])
+@login_required
+@check_is_user_admin
+def add_tag():
+    form = addtagform.AddTagForm()
+    if form.validate_on_submit():
+        req = {'title': form.title.data}
+        session = db_session.create_session()
+        tags = [i.title for i in session.query(Tag).all()]
+        if form.title.data in tags:
+            return render_template('add_tag.html', title='Добавление тэга', form=form,
+                                   message='Такой тэг уже существует!',
+                                   avatar_path=get_avatar_path())
+        res = tags_resources.TagListResource().post(args=req)
+        if res.json['success'] == 'OK':
+            return redirect('/')
+        else:
+            abort(404)
+    return render_template('add_tag.html', title='Добавление тэга', form=form,
+                           avatar_path=get_avatar_path())
+
+
+@app.route('/letters')
+@login_required
+def letters():
+    sent_letters = current_user.sent_letters
+    received_letters = current_user.received_letters
+    return render_template('letters.html', title='Письма',
+                           avatar_path=get_avatar_path())
 
 
 if __name__ == '__main__':

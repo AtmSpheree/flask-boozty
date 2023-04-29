@@ -82,13 +82,31 @@ class LetterListResource(Resource):
                 sent_letters = current_user.sent_letters
                 received_letters = current_user.received_letters
         if letters:
-            return jsonify({'letters': [item.to_dict(
-                only=('id', 'title', 'description')) for item in letters]})
+            result = {'letters': [item.to_dict(
+                only=('id', 'title', 'description', 'created_date',
+                      'who_sent', 'who_received')) for item in letters]}
+            for i in range(len(result['letters'])):
+                result['letters'][i]['who_sent'] = result['letters'][i]['who_sent'].id
+                result['letters'][i]['who_received'] = result['letters'][i]['who_received'].id
+            return jsonify(result)
         else:
-            return jsonify({'sent_letters': [item.to_dict(
-                only=('id', 'title', 'description')) for item in sent_letters],
-                            'received_letters': [item.to_dict(
-                only=('id', 'title', 'description')) for item in received_letters]})
+            result = {'sent_letters': [item.to_dict(
+                only=('id', 'title', 'description', 'created_date',
+                      'who_sent', 'who_received')) for item in sent_letters],
+                      'received_letters': [item.to_dict(
+                only=('id', 'title', 'description', 'created_date',
+                      'who_sent', 'who_received')) for item in received_letters]}
+            for i in range(len(result['sent_letters'])):
+                result['sent_letters'][i]['who_sent'] = {'id': result['sent_letters'][i]['who_sent'].id,
+                                                         'nickname': result['sent_letters'][i]['who_sent'].nickname}
+                result['sent_letters'][i]['who_received'] = {'id': result['sent_letters'][i]['who_received'].id,
+                                                             'nickname': result['sent_letters'][i]['who_received'].nickname}
+            for i in range(len(result['received_letters'])):
+                result['received_letters'][i]['who_sent'] = {'id': result['received_letters'][i]['who_sent'].id,
+                                                             'nickname': result['received_letters'][i]['who_sent'].nickname}
+                result['received_letters'][i]['who_received'] = {'id': result['received_letters'][i]['who_received'].id,
+                                                                 'nickname': result['received_letters'][i]['who_received'].nickname}
+            return jsonify(result)
 
     @login_required
     def post(self, user_id=None):

@@ -11,10 +11,10 @@ const THEME_TOGGLER = document.getElementById("theme-toggler");
 const GITHUB_LOGO_IMG = document.getElementById("github-logo");
 const GITHUB_TEXT_IMG = document.getElementById("github-text");
 const GITHUB_BUTTON = document.getElementById("github-button");
-const GITHUB_LOGO_IMG_WHITE_PATH = "static/img/GitHub_Logo_White.png";
-const GITHUB_TEXT_IMG_WHITE_PATH = "static/img/github-mark-white.png";
-const GITHUB_LOGO_IMG_DARK_PATH = "static/img/GitHub_Logo.png";
-const GITHUB_TEXT_IMG_DARK_PATH = "static/img/github-mark.png";
+const GITHUB_LOGO_IMG_WHITE_PATH = "/static/img/GitHub_Logo_White.png";
+const GITHUB_TEXT_IMG_WHITE_PATH = "/static/img/github-mark-white.png";
+const GITHUB_LOGO_IMG_DARK_PATH = "/static/img/GitHub_Logo.png";
+const GITHUB_TEXT_IMG_DARK_PATH = "/static/img/github-mark.png";
 
 let isDark = LOCAL_META_DATA_THEME && LOCAL_META_DATA_THEME.isDark;
 

@@ -1,9 +1,5 @@
 {
-	"users":
-		{
-			"admin": 
-				[
-					{"email": "grishaplay2803@mail.ru"}
-				]
-		}
+  "users": {
+    "admin": [{ "email": "" }]
+  }
 }

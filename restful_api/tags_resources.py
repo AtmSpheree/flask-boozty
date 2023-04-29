@@ -46,8 +46,9 @@ class TagListResource(Resource):
 
     @login_required
     @check_is_user_admin
-    def post(self):
-        args = parser.parse_args()
+    def post(self, args=None):
+        if args is None:
+            args = parser.parse_args()
         session = db_session.create_session()
         title = args['title']
         for tag in session.query(Tag).all():

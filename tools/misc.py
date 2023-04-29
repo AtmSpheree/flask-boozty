@@ -60,3 +60,7 @@ def test_is_photo(string):
 
 def get_only_photos_files(array):
     return [i for i in array if test_is_photo(i)]
+
+
+def get_tags_title(tags):
+    return [i["title"] for i in tags]

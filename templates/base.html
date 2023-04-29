@@ -23,16 +23,30 @@
       crossorigin="anonymous"
     ></script>
     <link id="dark-theme-style" rel="stylesheet" />
-    <link rel="stylesheet" type="text/css" href="../static/css/style.css" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{attachment}}/../static/css/style.css"
+    />
     <title>{{title}}</title>
-    <link rel="icon" type="image/x-icon" href="/static/img/favicon.png" />
+    <link
+      rel="icon"
+      type="image/x-icon"
+      href="{{attachment}}/static/img/favicon.png"
+    />
     <script type="application/json" id="stuff">
       {{json_file_variables}}
     </script>
   </head>
   <body>
-    <script type="text/javascript" src="static/scripts/path.js"></script>
-    <script type="text/javascript" src="static/scripts/tools.js"></script>
+    <script
+      type="text/javascript"
+      src="{{attachment}}/static/scripts/path.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="{{attachment}}/static/scripts/tools.js"
+    ></script>
     <header>
       <nav class="navbar navbar-light bg-light bg-gradient">
         <a href="/" style="text-decoration: none">
@@ -53,7 +67,7 @@
           <a href="/user/{{current_user.id}}" class="me-3">
             <img
               class="avatar_mini rounded-circle img-fluid"
-              src="\static\img\standart_avatar.png"
+              src="{{attachment}}/static/img/standart_avatar.png"
             />
           </a>
           {% endif %}
@@ -62,6 +76,9 @@
             href="/user/{{current_user.id}}"
             >{{ current_user.nickname }}</a
           >
+          <a type="button" class="btn btn-primary me-3 btn-lg" href="/letters">
+            Письма
+          </a>
           <a type="button" class="btn btn-danger me-3 btn-lg" href="/logout">
             Logout
           </a>
@@ -117,6 +134,9 @@
     >
       <h1 class="text-white">Written on the Python Flask</h1>
     </footer>
-    <script type="text/javascript" src="static/scripts/base.js"></script>
+    <script
+      type="text/javascript"
+      src="{{attachment}}/static/scripts/base.js"
+    ></script>
   </body>
 </html>

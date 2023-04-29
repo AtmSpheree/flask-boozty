@@ -22,13 +22,14 @@
                 <h4>{{post["title"]}}</h4>
                 <h5>{{post.created_date}}</h5>
               </div>
-              <h5>
+              <h4>
                 <a
                   onClick="RedirectOnLinkWithScript(this);return false;"
                   href="/user/{{post['user_id']}}"
                   >{{post['user_nickname']}}</a
                 >
-              </h5>
+              </h4>
+              <h5>Тэги: {{', '.join(get_tags_title(post["tags"]))}}</h5>
               <p>
                 {% if post["description"]|length > 70 %}
                 {{post["description"][:70]}}... {% else %}
@@ -149,7 +150,7 @@
     </div>
   </div>
   <div
-    class="btn-group d-flex flex-column align-items-center bg-light bg-gradient rounded p-3"
+    class="d-flex flex-column align-items-center bg-light bg-gradient rounded p-3"
     role="group"
     id="main_page_navigation"
   >
@@ -159,6 +160,12 @@
     </a>
     {% endif %}
     <h4 class="mt-3">Тэги</h4>
+    {% if current_user.is_authenticated %} {% if
+    check_is_user_admin_func(current_user.email) %}
+    <a type="button" class="btn btn-primary btn-lg mb-3" href="/add_tag">
+      Новый тег
+    </a>
+    {% endif %} {% endif %}
     <div id="tags_group" class="btn-group-vertical" role="group">
       <div id="accessed_tags" style="display: none">{{accessed_tags}}</div>
       {% for tag in tags %} {% if loop.first %}
