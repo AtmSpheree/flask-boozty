@@ -1,0 +1,201 @@
+{% extends "base.html" %} {% block content %}
+<meta charset="UTF-8" />
+<div class="main_page_main_container justify-content-around mt-5">
+  <div class="d-flex align-items-center flex-column w-50">
+    <h2 align="center" class="display-4 mb-3">Лента записей</h2>
+    <div class="accordion w-100" id="accordionExample">
+      {% for post in posts %} {% set number = loop.index %}
+      <div class="accordion-item">
+        <h2 class="accordion-header">
+          <button
+            class="accordion-button collapsed"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#collapse_{{loop.index}}"
+            aria-expanded="true"
+            aria-controls="collapse_{{loop.index}}"
+          >
+            <div
+              class="d-flex flex-column align-items-start justify-content-start w-100"
+            >
+              <div class="d-flex justify-content-between w-100">
+                <h4>{{post["title"]}}</h4>
+                <h5>{{post.created_date}}</h5>
+              </div>
+              <h4>
+                <a
+                  onClick="RedirectOnLinkWithScript(this);return false;"
+                  href="/user/{{post['user_id']}}"
+                  >{{post['user_nickname']}}</a
+                >
+              </h4>
+              <h5>Тэги: {{', '.join(get_tags_title(post["tags"]))}}</h5>
+              <p>
+                {% if post["description"]|length > 70 %}
+                {{post["description"][:70]}}... {% else %}
+                {{post["description"]}} {% endif %}
+              </p>
+            </div>
+          </button>
+        </h2>
+        <div
+          id="collapse_{{loop.index}}"
+          class="accordion-collapse collapse"
+          data-bs-parent="#accordionExample"
+        >
+          <div
+            class="accordion-body d-flex justify-content-start align-items-start flex-column"
+          >
+            <h1 class="pb-1">{{post["title"]}}</h1>
+            <p>{{post["description"]}}</p>
+
+            <div
+              id="carouselExampleIndicators_{{number}}"
+              class="carousel slide"
+              data-bs-interval="false"
+              data-bs-ride="carousel"
+            >
+              <div class="carousel-indicators">
+                {% for file in get_only_photos_files(post["files"].split(", "))
+                %} {% if loop.index0 == 0 %}
+                <button
+                  type="button"
+                  data-bs-target="#carouselExampleIndicators_{{number}}"
+                  data-bs-slide-to="{{loop.index0}}"
+                  class="active"
+                  aria-current="true"
+                  aria-label="Slide {{loop.index}}"
+                ></button>
+                {% else %}
+                <button
+                  type="button"
+                  data-bs-target="#carouselExampleIndicators_{{number}}"
+                  data-bs-slide-to="{{loop.index0}}"
+                  aria-label="Slide {{loop.index}}"
+                ></button>
+                {% endif %} {% endfor %}
+              </div>
+              <div class="carousel-inner">
+                {% for file in get_only_photos_files(post["files"].split(", "))
+                %} {% if loop.index0 == 0 %}
+                <div class="carousel-item active">
+                  <img
+                    src="{{url_func(file)}}"
+                    class="d-block w-100"
+                    alt="Slide {{loop.index}}"
+                  />
+                </div>
+                {% else %}
+                <div class="carousel-item">
+                  <img
+                    src="{{url_func(file)}}"
+                    class="d-block w-100"
+                    alt="Slide {{loop.index}}"
+                  />
+                </div>
+                {% endif %} {% endfor %}
+              </div>
+              <button
+                class="carousel-control-prev"
+                type="button"
+                data-bs-target="#carouselExampleIndicators_{{number}}"
+                data-bs-slide="prev"
+              >
+                <span
+                  class="carousel-control-prev-icon"
+                  aria-hidden="true"
+                ></span>
+                <span class="visually-hidden">Предыдущий</span>
+              </button>
+              <button
+                class="carousel-control-next"
+                type="button"
+                data-bs-target="#carouselExampleIndicators_{{number}}"
+                data-bs-slide="next"
+              >
+                <span
+                  class="carousel-control-next-icon"
+                  aria-hidden="true"
+                ></span>
+                <span class="visually-hidden">Следующий</span>
+              </button>
+            </div>
+          </div>
+          <div id="not_photos_files_{{loop.index}}">
+            {% for file in post["files"].split(", ") %} {% if file != "" and not
+            test_is_photo(file) %}
+            <div class="card mb-3 ms-3 p-2" style="max-width: 840px">
+              <div class="row g-0 d-flex align-items-center">
+                <div class="col-md-1">
+                  <img
+                    src="\static\img\standart_document.png"
+                    class="img-fluid rounded-start"
+                    alt="file_ico"
+                  />
+                </div>
+                <div class="col-md-8">
+                  <div class="card-body">
+                    <a download href="{{url_func(file)}}">
+                      <h5 class="card-title">{{file}}</h5></a
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+            {% endif %} {% endfor %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  <div
+    class="d-flex flex-column align-items-center bg-light bg-gradient rounded p-3"
+    role="group"
+    id="main_page_navigation"
+  >
+    {% if current_user.is_authenticated %}
+    <a type="button" class="btn btn-primary btn-lg" href="/add_post">
+      Новая запись
+    </a>
+    {% endif %}
+    <h4 class="mt-3">Тэги</h4>
+    {% if current_user.is_authenticated %} {% if
+    check_is_user_admin_func(current_user.email) %}
+    <a type="button" class="btn btn-primary btn-lg mb-3" href="/add_tag">
+      Новый тег
+    </a>
+    {% endif %} {% endif %}
+    <div id="tags_group" class="btn-group-vertical" role="group">
+      <div id="accessed_tags" style="display: none">{{accessed_tags}}</div>
+      {% for tag in tags %} {% if loop.first %}
+      <input
+        type="checkbox"
+        class="btn-check"
+        value="0"
+        onclick="tagChange(this)"
+        id="btncheck{{loop.index}}"
+        autocomplete="off"
+        checked
+      />
+      {% else %}
+      <input
+        type="checkbox"
+        class="btn-check"
+        value="{{tag['id']}}"
+        onclick="tagChange(this)"
+        id="btncheck{{loop.index}}"
+        autocomplete="off"
+      />
+      {% endif %}
+      <label
+        class="btn btn-outline-secondary btn-lg"
+        for="btncheck{{loop.index}}"
+        >{{tag['title']}}</label
+      >
+      {% endfor %}
+    </div>
+  </div>
+</div>
+<script type="text/javascript" src="static/scripts/index.js"></script>
+{% endblock %}

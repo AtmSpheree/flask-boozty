@@ -1,0 +1,107 @@
+{% extends "base.html" %} {% block content %}
+<div class="d-flex justify-content-start align-items-center flex-column">
+  <h2 align="center" class="display-4 mb-3">Добавление записи</h2>
+  <form
+    class="bg-light bg-gradient rounded p-3 w-25 simple_form"
+    action=""
+    method="post"
+    enctype="multipart/form-data"
+    novalidate
+    name="form"
+  >
+    {{ form.hidden_tag() }}
+    <h5>
+      {{ form.title.label }}<br />
+      {{ form.title(class="form-control") }}
+    </h5>
+    {% for error in form.title.errors %}
+    <div class="alert alert-danger mb-0 p-2" role="alert">{{error}}</div>
+    {% endfor %}<br />
+
+    <h5>
+      {{ form.description.label }}<br />
+      {{ form.description(class="form-control") }}
+    </h5>
+    {% for error in form.description.errors %}
+    <div class="alert alert-danger mb-0 p-2" role="alert">{{error}}</div>
+    {% endfor %}<br />
+
+    <h5>
+      {{ form.files.label }}<br />
+      {{ form.files(class="form-control", type="file", multiple='') }}
+    </h5>
+    {% for error in form.files.errors %}
+    <div class="alert alert-danger mb-0 p-2" role="alert">{{error}}</div>
+    {% endfor %}<br />
+
+    <h5>
+      {{ form.tags.label }} {{ form.tags(type="hidden") }}<br />
+      <div
+        class="btn-group-vertical mt-2"
+        role="group"
+        id="tags_block"
+        style="display: block"
+      >
+        {% for tag in tags %} {% if loop.first %}
+        <input
+          type="checkbox"
+          class="btn-check"
+          id="btn-checkbox{{loop.index}}"
+          autocomplete="off"
+        />
+        {% else %}
+        <input
+          type="checkbox"
+          class="btn-check"
+          id="btn-checkbox{{loop.index}}"
+          autocomplete="off"
+        />
+        {% endif %}
+        <label
+          class="btn btn-outline-secondary"
+          for="btn-checkbox{{loop.index}}"
+          name="tag_name"
+          >{{tag['title']}}</label
+        >
+        {% endfor %}
+      </div>
+    </h5>
+    {% for error in form.tags.errors %}
+    <div class="alert alert-danger mb-0 p-2" role="alert">{{error}}</div>
+    {% endfor %}<br />
+
+    <h5>
+      {{ form.is_opened(onClick="changeFormCheckboxIsOpened()") }} {{
+      form.is_opened.label}}
+    </h5>
+
+    <h5>
+      {{ form.invited_users(type="hidden") }}
+      <h6 id="users_block_text"></h6>
+
+      <div
+        class="btn-group-vertical pb-4"
+        role="group"
+        id="users_block"
+        style="display: none"
+      ></div>
+    </h5>
+
+    <h5>
+      <button
+        class="btn btn-primary"
+        onClick="submitAddPostForm()"
+        type="button"
+        id="submit_btn"
+        name="submit_btn"
+      >
+        {{form.submit.label.text}}
+      </button>
+    </h5>
+    {% if message %}
+    <div class="alert alert-danger mb-0 p-2" role="alert">{{ message }}</div>
+    {% endif %}
+  </form>
+</div>
+<script type="text/javascript" src="static/scripts/addpost.js"></script>
+{% endblock %}

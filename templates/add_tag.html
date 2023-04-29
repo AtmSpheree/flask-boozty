@@ -1,0 +1,25 @@
+{% extends "base.html" %} {% block content %}
+<div class="d-flex justify-content-start align-items-center flex-column">
+  <h2 align="center" class="display-4">Добавление тэга</h2>
+  <form
+    class="bg-light bg-gradient rounded p-3 w-25 simple_form"
+    action=""
+    method="post"
+    novalidate
+  >
+    {{ form.hidden_tag() }}
+    <h5>
+      {{ form.title.label }}<br />
+      {{ form.title(class="form-control") }}
+    </h5>
+    {% for error in form.title.errors %}
+    <div class="alert alert-danger mb-0 p-2" role="alert">{{error}}</div>
+    {% endfor %}<br />
+
+    <h5>{{ form.submit(type="submit", class="btn btn-primary") }}</h5>
+    {% if message %}
+    <div class="alert alert-danger mb-0 p-2" role="alert">{{ message }}</div>
+    {% endif %}
+  </form>
+</div>
+{% endblock %}

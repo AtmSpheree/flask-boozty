@@ -127,3 +127,12 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Virtualenv
+venv/
+
+# Idea
+.idea/
+
+# Node JS
+static/scripts/node

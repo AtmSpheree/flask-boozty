@@ -1,0 +1,11 @@
+{
+	"MAX_CONTENT_LENGTH_BYTES": 10485760,
+	"ALLOWED_EXTENSIONS_PHOTOS": ["png", "jpg", "jpe", "jpeg"],
+	"ALLOWED_EXTENSIONS_FILES": ["png", "jpg", "jpe", "jpeg", "pdf", "rtf", "odf", "ods", "gnumeric", "abw", "doc", "docx", "xls", "xlsx", "txt"],
+	"UPLOAD_FOLDER": "db\\uploads",
+	"UPLOAD_FOLDER_FOR_REQUEST": "_uploads",
+	"UPLOAD_FOLDER_PHOTOS": "photos",
+	"UPLOAD_FOLDER_FILES": "files",
+	"MAX_FILES_COUNT": 10,
+	"DEFAULT_PHOTOS_PATH": "static\\img\\standart_avatar.png"
+}
